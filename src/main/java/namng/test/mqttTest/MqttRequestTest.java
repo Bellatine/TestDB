@@ -14,9 +14,28 @@ import java.nio.charset.StandardCharsets;
 public class MqttRequestTest {
     private static final Logger logger = LogManager.getLogger(MqttRequestTest.class);
 
-    public void createConnection(){
-        String broker = "tcp://broker.hivemq.com:1883";
-        String clientId = "ID_OF_CLIENT";
+    public void publishMessage(MqttClient mqttClient, String subTopic, String pubTopic, String content,int qos ){
+        try{
+
+            mqttClient.subscribe(subTopic);
+
+            MqttMessage mqttMessage = new MqttMessage(content.getBytes(StandardCharsets.UTF_8));
+            mqttMessage.setQos(qos);
+
+            logger.info("Publishing message " + content);
+            mqttClient.publish(pubTopic, mqttMessage);
+            logger.info("publish success");
+
+            Thread.sleep(5000);
+
+            disconnectConnection(mqttClient);
+
+        }catch (Exception e){
+            logger.error(e,e);
+        }
+    }
+
+    public MqttClient createConnection(String broker, String clientId){
         MemoryPersistence persistence = new MemoryPersistence();
         try {
             MqttClient mqttClient = new MqttClient(broker, clientId, persistence);
@@ -29,32 +48,20 @@ public class MqttRequestTest {
             mqttClient.connect(connOpts);
             logger.info("Connected");
 
-            String subTopic = " ";
-            String pubTopic = "/ktmt/iot";
-            String content = "I'm Giang Nam";
-            int qos = 1;
+            return mqttClient;
+        } catch (Exception e) {
+            logger.error("Error create connection ", e);
+            return null;
+        }
+    }
 
-            mqttClient.subscribe(subTopic);
-
-            MqttMessage mqttMessage = new MqttMessage(content.getBytes(StandardCharsets.UTF_8));
-            mqttMessage.setQos(qos);
-
-            logger.info("Publishing message " + content);
-            mqttClient.publish(pubTopic, mqttMessage);
-            logger.info("publish success");
-
-//            mqttClient.publish(topic,
-//                    content.getBytes(),
-//                    qos);
-
-            // Wait for some time to receive messages
-            Thread.sleep(5000);
-
+    public void disconnectConnection(MqttClient mqttClient){
+        try{
             mqttClient.disconnect();
             logger.info("Disconnected");
             System.exit(0);
-        } catch (Exception e) {
-            logger.error(e,e);
+        }catch (Exception e){
+            logger.error("Error disconnect connection ", e);
         }
     }
 

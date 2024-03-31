@@ -38,7 +38,13 @@ public class Main {
         logger.info(key2 + " :" + field2);
 
         MqttRequestTest mqttRequestTest = new MqttRequestTest();
-        mqttRequestTest.createConnection();
+        String broker = "tcp://broker.hivemq.com:1883";
+        String clientId = "namng";
+        String subTopic = "/test/namng";
+        String pubTopic = "/test/namng";
+        String content = "I'm Giang Nam";
+        int qos = 1;
+        mqttRequestTest.publishMessage(mqttRequestTest.createConnection(broker,clientId),subTopic,pubTopic,content,qos);
 
     }
 
