@@ -1,5 +1,8 @@
 package namng.test.mqttTest;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -15,9 +18,16 @@ public class TestMqttCallback implements MqttCallback {
 
     @Override
     public void messageArrived(String topic, MqttMessage mqttMessage) throws Exception {
-        logger.info("Message received content: " + new String(mqttMessage.getPayload()));
-        logger.info("Message received Qos " + mqttMessage.getQos());
-        logger.info("Message received topic " + topic);
+        // Nhận tin nhắn và xử lý
+        String json = new String(mqttMessage.getPayload());
+        logger.info("Received message: " + json);
+
+        // Phân tích tin nhắn JSON và in ra từng trường dữ liệu
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        for (String key : jsonObject.keySet()) {
+            JsonElement value = jsonObject.get(key);
+            logger.info("Field " + key + ": " + value);
+        }
 
     }
 

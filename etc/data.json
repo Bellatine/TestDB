@@ -1,4 +1,11 @@
 {
-  "field1": 33,
-  "field2": 44
+
+  "DeviceId":11,
+
+  "packet_no":126,
+
+  "temperature":30,
+
+  "humidity":60
+
 }
